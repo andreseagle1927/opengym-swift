@@ -4,7 +4,7 @@ This repository contains an iOS SwiftUI authentication starter for the OpenGym A
 
 ## Use in an iOS app
 
-Add `swift/` as a local Swift Package in Xcode, then show `OpenGymSignInView()` from the host app. The package targets iOS 16 and depends on GoogleSignIn-iOS. Set the host app's bundle identifier to `com.adrenocromo.gym` or update the registered provider identifiers to match.
+Add `swift/` as a local Swift Package in Xcode, then show `OpenGymSignInView()` from the host app. The package targets iOS 16 and requires GoogleSignIn-iOS 9.0 or newer for server nonce protection. Set the host app's bundle identifier to `com.adrenocromo.gym` or update the registered provider identifiers to match.
 
 For Google, add the iOS OAuth client ID to `GOOGLE_IOS_CLIENT_ID`, include it and the web/server client ID in `GOOGLE_CLIENT_IDS`, and configure the reversed client ID URL scheme required by GoogleSignIn in the host app's URL Types. The server client ID must also be `GOOGLE_WEB_CLIENT_ID`.
 

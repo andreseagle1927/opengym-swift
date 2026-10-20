@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.iOS(.v16)],
     products: [.library(name: "OpenGymAuth", targets: ["OpenGymAuth"])],
     dependencies: [
-        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "8.0.0")
+        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "9.0.0")
     ],
     targets: [
         .target(name: "OpenGymAuth", dependencies: [

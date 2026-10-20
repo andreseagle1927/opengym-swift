@@ -1,0 +1,20 @@
+name: iOS package build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-ios-simulator:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build package for iOS Simulator
+        run: |
+          SDK_PATH="$(xcrun --sdk iphonesimulator --show-sdk-path)"
+          swift build \
+            --package-path swift \
+            --triple arm64-apple-ios16.0-simulator \
+            --sdk "$SDK_PATH"
