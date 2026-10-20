@@ -91,7 +91,7 @@ public actor OpenGymAuthClient {
     }
 
     public func registerPasskey(name: String, inviteCode: String = "") async throws -> AuthProfile {
-        let optionsResponse = try await post("/api/register/options", body: ["name": name, "code": inviteCode]) as [String: Any]
+        let optionsResponse = try await postObject("/api/register/options", body: ["name": name, "code": inviteCode])
         guard let cid = optionsResponse["cid"] as? String,
               let options = optionsResponse["options"] as? [String: Any],
               let challengeString = options["challenge"] as? String,
@@ -127,7 +127,7 @@ public actor OpenGymAuthClient {
     }
 
     public func signInWithPasskey() async throws -> AuthProfile {
-        let optionsResponse = try await post("/api/login/options", body: [:]) as [String: Any]
+        let optionsResponse = try await postObject("/api/login/options", body: [:])
         guard let cid = optionsResponse["cid"] as? String,
               let options = optionsResponse["options"] as? [String: Any],
               let challengeString = options["challenge"] as? String else { throw AuthClientError.invalidResponse }
@@ -184,11 +184,12 @@ public actor OpenGymAuthClient {
         return try await request(path, method: "POST", body: encoded, authenticated: authenticated)
     }
 
-    private func post(_ path: String, body: [String: String]) async throws -> Any {
+    private func postObject(_ path: String, body: [String: String]) async throws -> [String: Any] {
         let encoded = try JSONSerialization.data(withJSONObject: body)
         let (data, response) = try await rawRequest(path, method: "POST", body: encoded, authenticated: false)
         guard (200..<300).contains(response.statusCode) else { throw serverError(data, status: response.statusCode) }
-        return try JSONSerialization.jsonObject(with: data)
+        guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw AuthClientError.invalidResponse }
+        return object
     }
 
     private func postJSON<T: Decodable>(_ path: String, body: [String: Any]) async throws -> T {

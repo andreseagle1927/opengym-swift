@@ -50,6 +50,7 @@ public final class OpenGymAuthModel: ObservableObject {
     }
 }
 
+@MainActor
 public struct OpenGymSignInView: View {
     @StateObject private var model: OpenGymAuthModel
     @State private var isRegistering = false
@@ -147,13 +148,17 @@ public struct OpenGymSignInView: View {
         do {
             let challenge = try await model.client.providerChallenge("google")
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: iosClient, serverClientID: serverClient)
-            GIDSignIn.sharedInstance.signIn(withPresenting: presenter, hint: nil, additionalScopes: [], nonce: challenge.nonce) { result, error in
-                Task { @MainActor in
-                    if let error { model.message = error.localizedDescription; return }
-                    guard let token = result?.user.idToken?.tokenString else { model.message = "Google did not return an identity token."; return }
-                    await model.signIn(provider: "google", challenge: challenge, idToken: token, name: result?.user.profile?.name ?? "", inviteCode: inviteCode)
-                }
+            let result = try await GIDSignIn.sharedInstance.signIn(
+                withPresenting: presenter,
+                hint: nil,
+                additionalScopes: [],
+                nonce: challenge.nonce
+            )
+            guard let token = result.user.idToken?.tokenString else {
+                model.message = "Google did not return an identity token."
+                return
             }
+            await model.signIn(provider: "google", challenge: challenge, idToken: token, name: result.user.profile?.name ?? "", inviteCode: inviteCode)
         } catch { model.message = error.localizedDescription }
     }
 
