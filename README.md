@@ -8,7 +8,7 @@ Add `swift/` as a local Swift Package in Xcode, then show `OpenGymSignInView()` 
 
 For Google, add the iOS OAuth client ID to `GOOGLE_IOS_CLIENT_ID`, include it and the web/server client ID in `GOOGLE_CLIENT_IDS`, and configure the reversed client ID URL scheme required by GoogleSignIn in the host app's URL Types. The server client ID must also be `GOOGLE_WEB_CLIENT_ID`.
 
-For Apple, enable Sign in with Apple for the host app's App ID. For web/Android Apple sign-in, also create a Services ID, register `https://gym.adrenocromo.com/api/auth/apple/callback` as a return URL, set it as `APPLE_WEB_CLIENT_ID` and `APPLE_REDIRECT_URL`, and include both Apple audiences in `APPLE_CLIENT_IDS`. Keep Apple signing keys and other secrets on the server only.
+For Apple, enable Sign in with Apple for the host app's App ID. For web/Android Apple sign-in, also create a Services ID, register `https://gym.adrenocromo.com/api/auth/apple/callback` as a return URL, set it as `APPLE_WEB_CLIENT_ID` and `APPLE_REDIRECT_URL`, and include both Apple audiences in `APPLE_CLIENT_IDS`. This backend validates Apple ID tokens against Apple's published keys; it does not need an Apple private signing key or client secret.
 
 Native passkeys use the API's configured `RP_ID`. Configure the iOS host app's Associated Domains capability with `webcredentials:gym.adrenocromo.com`, and serve a valid Apple App Site Association file for that RP ID that lists the host app's Team ID and bundle ID. For a different deployment domain, change the API `RP_ID` and use that domain in the entitlement and association file.
 
