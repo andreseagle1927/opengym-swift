@@ -19,7 +19,9 @@ public struct AuthConfiguration: Decodable, Sendable {
     public let invite_only: Bool
     public let password_enabled: Bool
     public let google_enabled: Bool
+    public let google_ios_enabled: Bool
     public let apple_enabled: Bool
+    public let apple_native_enabled: Bool
     public let google_client_id: String?
     public let google_ios_client_id: String?
     public let apple_client_id: String?

@@ -52,6 +52,7 @@ public final class OpenGymAuthModel: ObservableObject {
 
 @MainActor
 public struct OpenGymSignInView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var model: OpenGymAuthModel
     @State private var isRegistering = false
     @State private var name = ""
@@ -94,12 +95,12 @@ public struct OpenGymSignInView: View {
                     }
                 }.buttonStyle(.bordered).disabled(model.isBusy || (isRegistering && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
 
-                if model.configuration?.google_enabled == true {
+                if model.configuration?.google_ios_enabled == true {
                     Button(action: { Task { await googleSignIn() } }) {
                         Label("Continue with Google", systemImage: "globe")
                     }.buttonStyle(.bordered).disabled(model.isBusy)
                 }
-                if model.configuration?.apple_enabled == true, let appleChallenge {
+                if model.configuration?.apple_native_enabled == true, let appleChallenge {
                     SignInWithAppleButton(.signIn, onRequest: { request in
                         request.requestedScopes = [.email, .fullName]
                         request.nonce = OpenGymAuthClient.appleNonceHash(appleChallenge.nonce)
@@ -133,10 +134,21 @@ public struct OpenGymSignInView: View {
             await model.load()
             await refreshAppleChallenge()
         }
+        .task(id: model.configuration?.apple_native_enabled) {
+            guard model.configuration?.apple_native_enabled == true else { return }
+            while !Task.isCancelled {
+                do { try await Task.sleep(nanoseconds: 180_000_000_000) }
+                catch { return }
+                await refreshAppleChallenge()
+            }
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { Task { await refreshAppleChallenge() } }
+        }
     }
 
     private func refreshAppleChallenge() async {
-        guard model.configuration?.apple_enabled == true else { return }
+        guard model.configuration?.apple_native_enabled == true else { appleChallenge = nil; return }
         appleChallenge = try? await model.client.providerChallenge("apple")
     }
 
