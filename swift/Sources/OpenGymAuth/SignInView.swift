@@ -62,7 +62,7 @@ public struct OpenGymSignInView: View {
     @State private var resetPassword = ""
     @State private var appleChallenge: ProviderChallenge?
 
-    public init(model: OpenGymAuthModel = OpenGymAuthModel()) { _model = StateObject(wrappedValue: model) }
+    public init(model: OpenGymAuthModel? = nil) { _model = StateObject(wrappedValue: model ?? OpenGymAuthModel()) }
 
     public var body: some View {
         VStack(spacing: 14) {
